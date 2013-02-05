@@ -1,0 +1,26 @@
+[__DEFAULT__]
+	output = "ok\n"
+
+[__OVERWRITE__]
+
+[tests]
+	[[functions]]
+		source = "test_functions.mu"
+	[[load_and_call]]
+		source = "test_load_and_call.mu"
+	[[local_functions]]
+		source = "test_local_functions.mu"
+		output_mode = "file"
+		output = "local_functions.out"
+		options = "-llocal_functions"
+	[[local_operators]]
+		source = "test_local_operators.mu"
+		output_mode = "file"
+		output = "local_operators.out"
+		options = "-llocal_operators"
+	[[operators]]
+		source = "test_operators.mu"
+	[[return]]
+		source = "test_return.mu"
+		output_mode = "file"
+		output = "return.out"

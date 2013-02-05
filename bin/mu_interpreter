@@ -1,0 +1,143 @@
+#!/usr/bin/env python
+
+import os
+import time
+
+from MU.mu import *
+from MU import mu_config
+from MU import mu_tutorial 
+#from terminal_size import terminal_size
+
+def main():
+  import sys
+  import traceback
+  import optparse
+  opt_list = [
+		optparse.make_option(	'-T', '--tutorial',
+					dest='tutorial',
+					action="store_true",
+					default=None,
+					help='show tutorial [default: %default]',
+		),
+		optparse.make_option(	'-t', '--test',
+					dest='test',
+					action="store_true",
+					default=None,
+					help='run test suite [default: %default]',
+		),
+		optparse.make_option(	'-H', '--print-operators',
+					dest='print_operators',
+					action="store_true",
+					default=None,
+					help='print operators [default: %default]',
+		),
+		optparse.make_option(	'-S', '--print-symbols',
+					dest='print_symbols',
+					action="store_true",
+					default=None,
+					help='print symbols [default: %default]',
+		),
+		optparse.make_option(	'-u', '--unicode',
+					dest='unicode',
+					action="store_true",
+					default=True,
+					help='use unicode [default: %default]',
+		),
+		optparse.make_option(	'-B', '--dump-boards',
+					dest='dump_boards',
+					action="store_true",
+					default=False,
+					help='dump boards and exit [default: %default]',
+		),
+  ]
+  mu_interpreter = Mu_Interpreter()
+  options, args = mu_interpreter.parse_args(additional_options=opt_list)
+
+  #help_formatter=optparse.IndentedHelpFormatter(max_help_position=38)
+  #parser = optparse.OptionParser(option_list=opt_list,formatter=help_formatter)
+
+  #(options,args) = parser.parse_args(sys.argv[1:])
+
+  #if options.thread_width is not None:
+  #  Mu_Error.WIDTH = options.thread_width
+
+  #if options.unicode is not None:
+  #  Mu_Error.UNICODE = options.unicode
+
+  if options.tutorial:
+    mu_tutorial.Mu_Tutorial()
+    sys.exit(0)
+
+  if options.test:
+    os.system(os.path.join(mu_config.MU_BINDIR, "mu_test"))
+    sys.exit(0)
+
+  if options.print_operators:
+    fmt = "%32s %10s %s"
+    print fmt % ("OPERATOR_NAME", "SYMS", "DESCRIPTION")
+    so = Mu.SYMBOL_OPERATOR.items() + Mu.FAKE_SYMBOL_OPERATOR.items()
+    for op_name, (op_description, op_empty) in Mu.OPERATOR.iteritems():
+      lst = [s for (s,o) in so if o == op_name]
+      op_name_cont = '"' + ' '*(len(op_name)/2)
+      op_description_cont = ' '*(len(op_description)/2) + '"'
+      for s in lst:
+        op_symbol = repr(chr(s))
+        print fmt % (op_name, op_symbol, op_description)
+        op_name = op_name_cont
+        op_description = op_description_cont
+    sys.exit(0)
+  elif options.print_symbols:
+    fmt = "%3s %6s %-32s %s"
+    print fmt % ("ORD", "S", "OPERATOR_NAME", "DESCRIPTION")
+    d_so = Mu.SYMBOL_OPERATOR.copy()
+    d_so.update(Mu.FAKE_SYMBOL_OPERATOR)
+    for c in xrange(Mu.MAX_ORD+1):
+      lst = [o for (s, o) in d_so.iteritems() if s == c]
+      for op_name in lst:
+        (op_description, op_empty)  = Mu.OPERATOR[op_name]
+        print fmt % ("%03d"%c, repr(chr(c)), op_name, op_description)
+    sys.exit(0)
+      
+
+  mu_interpreter.setup()
+
+  #libraries = options.libs
+  #libdirs = options.libdirs
+  #sources = options.include_filenames + args
+  #mu_interpreter = Mu_Interpreter(
+  #  sources=sources,
+  #  libraries=libraries,
+  #  libdirs=libdirs,
+  #  debug=options.debug,
+  #  wgui=options.w_debug,
+  #  xgui=options.x_debug,
+  #  concat=options.concat,
+  #)
+
+  try:
+    mu_interpreter.parse()
+  except Mu_CodeError, e:
+    #traceback.print_exc()
+    e.trace(sys.stderr, width=options.thread_width)
+    sys.exit(1)
+  try:
+    mu_interpreter.run()
+  except Mu_CodeError, e:
+    #traceback.print_exc()
+    e.trace(sys.stderr, width=options.thread_width)
+    sys.exit(2)
+
+  if options.report:
+    iterations, elapsed_parse, elapsed_run, elapsed_iteration = mu_interpreter.report()
+    print
+    print "#iterations:           %d" % iterations
+    if elapsed_parse is not None:
+      print "#elapsed time (parse): %f [s]" % elapsed_parse
+    if elapsed_run is not None:
+      print "#elapsed time (run):   %f [s]" % elapsed_run
+    if elapsed_iteration is not None:
+      print "#time per iteration:   %f [s]" % elapsed_iteration
+
+ 
+if __name__ == '__main__':
+  main()

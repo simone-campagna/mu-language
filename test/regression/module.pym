@@ -1,0 +1,2 @@
+def PYM_push_ok(thread):
+  thread.stack.push(thread, thread.mu_board.mu.a2i("ok\n"))

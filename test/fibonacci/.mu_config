@@ -1,0 +1,10 @@
+[__DEFAULT__]
+
+[__OVERWRITE__]
+
+[tests]
+	[[fibonacci]]
+		source = "test_fibonacci.mu"
+		output_mode = "file"
+		output = "fibonacci.out"
+		options = "-lmath"

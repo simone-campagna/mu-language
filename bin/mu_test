@@ -1,0 +1,979 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+from contrib import configobj
+from contrib import validate
+from contrib import progressbar as pbar
+
+from progressbar.widget import *
+
+import time
+from MU import mu
+
+class PBar(Screen):
+  def __init__(self):
+    ko_formatter = Color('red')
+    ok_formatter = Color('green')
+    todo_formatter = Color('blue')
+    self.wtot_pbar = SimpleProgressBar(
+		(
+			Segment(u'▣', formatter=ko_formatter),
+			Segment(u'▣', formatter=ok_formatter),
+			Segment(u'□', formatter=todo_formatter),
+		),
+		span=-100.0,
+    )
+    self.wtot_completed_percentage = self.wtot_pbar.get_completed_percentage_widget(span=7)
+    self.wtot_max_value = self.wtot_pbar.get_max_value_widget(span=7)
+    self.wtot_value_ko, self.wtot_value_ok, self.wtot_value_todo = self.wtot_pbar.get_value_widgets(span=7)
+    self.wtot_percentage_ko, self.wtot_percentage_ok, self.wtot_percentage_todo = self.wtot_pbar.get_percentage_widgets(span=7)
+    self.wtot_remaining_duration = self.wtot_pbar.get_remaining_duration_widget(span=7)
+
+    self.wtst_pbar = SimpleProgressBar(
+		(
+			Segment(u'▣', formatter=ko_formatter),
+			Segment(u'▣', formatter=ok_formatter),
+			Segment(u'□', formatter=todo_formatter),
+		),
+		span=-100.0,
+    )
+    self.wtst_completed_percentage = self.wtst_pbar.get_completed_percentage_widget(span=7)
+    self.wtst_max_value = self.wtst_pbar.get_max_value_widget(span=7)
+    self.wtst_value_ko, self.wtst_value_ok, self.wtst_value_todo = self.wtst_pbar.get_value_widgets(span=7)
+    self.wtst_percentage_ko, self.wtst_percentage_ok, self.wtst_percentage_todo = self.wtst_pbar.get_percentage_widgets(span=7)
+    self.wtst_remaining_duration = self.wtst_pbar.get_remaining_duration_widget(span=7)
+    wtst_container = Widget(
+		(
+			u'◀', self.wtst_pbar, u'▶'
+			#u'◀', self.wtst_pbar, u'▶'
+			u"❨",
+			self.wtst_remaining_duration,
+			u"❩",
+		),
+		span=None,
+    )
+
+    self.wdir_pbar = SimpleProgressBar(
+		(
+			Segment(u'▣', formatter=ko_formatter),
+			Segment(u'▣', formatter=ok_formatter),
+			Segment(u'□', formatter=todo_formatter),
+		),
+		span=-100.0,
+    )
+    self.wdir_completed_percentage = self.wdir_pbar.get_completed_percentage_widget(span=7)
+    self.wdir_max_value = self.wdir_pbar.get_max_value_widget(span=7)
+    self.wdir_value_ko, self.wdir_value_ok, self.wdir_value_todo = self.wdir_pbar.get_value_widgets(span=7)
+    self.wdir_percentage_ko, self.wdir_percentage_ok, self.wdir_percentage_todo = self.wdir_pbar.get_percentage_widgets(span=7)
+    self.wdir_remaining_duration = self.wdir_pbar.get_remaining_duration_widget(span=7)
+    wdir_container = Widget(
+		(
+			u'◀', self.wdir_pbar, u'▶'
+		),
+		span=None,
+    )
+
+    for w in	(
+			self.wtot_value_ko, self.wtot_percentage_ko,
+			self.wdir_value_ko, self.wdir_percentage_ko,
+			self.wtst_value_ko, self.wtst_percentage_ko,
+    ):
+      w.set_formatter(ko_formatter)
+    for w in	(	
+			self.wtot_value_ok, self.wtot_percentage_ok,
+			self.wdir_value_ok, self.wdir_percentage_ok,
+			self.wtst_value_ok, self.wtst_percentage_ok,
+		):
+      w.set_formatter(ok_formatter)
+    for w in	(
+			self.wtot_value_todo, self.wtot_percentage_todo,
+			self.wdir_value_todo, self.wdir_percentage_todo,
+			self.wtst_value_todo, self.wtst_percentage_todo,
+		):
+      w.set_formatter(todo_formatter)
+
+    #self.wdir = Text(span=-25.0)
+    t_formatter_w = Formatter(color="blue", bold=True)
+    t_formatter_wr = Formatter(color="red", bold=True)
+    t_formatter_y = Formatter(color="yellow")
+    t_formatter_r = Formatter(color="blue", bold=True)
+    self.wdir_name = Text(span=40, justify=Text.LEFT, formatter=t_formatter_r)
+    self.wtst_name = Text(span=40, justify=Text.LEFT, formatter=t_formatter_r)
+    self.wtst_command = Text(span=-100.0, formatter=t_formatter_y)
+    timing_format = "%(tot_seconds).2f[s]"
+    timing_formatter_last = Formatter(color="blue")
+    timing_formatter_total = Formatter(color="blue")
+    timing_formatter_ave = Formatter(color="blue")
+    self.wtst_timing_last = Duration(format=timing_format, formatter=timing_formatter_last)
+    self.wdir_timing_total = Duration(format=timing_format, formatter=timing_formatter_total)
+    self.wdir_timing_ave = Duration(format=timing_format, formatter=timing_formatter_ave)
+    self.wtot_timing_total = Duration(format=timing_format, formatter=timing_formatter_total)
+    self.wtot_timing_ave = Duration(format=timing_format, formatter=timing_formatter_ave)
+    line_top = Line(
+			(
+				u"┏━━━━━━━┰",
+				Filler(u"━", after=u"┓"),
+			),
+    )
+    line_values = Line(
+			(
+				u"┃",
+				Text("VALUES".center(7), formatter=t_formatter_w),
+				u"│",
+				Widget( (
+					Text('dir:', formatter=t_formatter_w),
+					self.wdir_value_ko,
+					u"│",
+					self.wdir_value_ok,
+					u"│",
+					self.wdir_value_todo,
+					Filler(),
+				), span=-33.33),
+				Widget( (
+					Text('tst:', formatter=t_formatter_w),
+					self.wtst_value_ko,
+					u"│",
+					self.wtst_value_ok,
+					u"│",
+					self.wtst_value_todo,
+					Filler(),
+				), span=-33.33),
+				Widget( (
+					Text('tot:', formatter=t_formatter_w),
+					self.wtot_value_ko,
+					u"│",
+					self.wtot_value_ok,
+					u"│",
+					self.wtot_value_todo,
+					Filler(),
+				), span=-33.33),
+				u"┃",
+			),
+		)
+    line_percentages = Line(
+			(
+				u"┃",
+				Text("PERC.".center(7), formatter=t_formatter_w),
+				u"│",
+				Widget( (
+					Text('dir:', formatter=t_formatter_w),
+					self.wdir_percentage_ko,
+					u"│",
+					self.wdir_percentage_ok,
+					u"│",
+					self.wdir_percentage_todo,
+					Filler(),
+				), span=-33.33),
+				Widget( (
+					Text('tst:', formatter=t_formatter_w),
+					self.wtst_percentage_ko,
+					u"│",
+					self.wtst_percentage_ok,
+					u"│",
+					self.wtst_percentage_todo,
+					Filler(),
+				), span=-33.3),
+				Widget( (
+					Text('tot:', formatter=t_formatter_w),
+					self.wtot_percentage_ko,
+					u"│",
+					self.wtot_percentage_ok,
+					u"│",
+					self.wtot_percentage_todo,
+					Filler(),
+				), span=-33.33),
+				u"┃",
+			),
+		)
+    line_timing = Line(
+			(
+				u"┃",
+				Text("TIMING".center(7), formatter=t_formatter_w),
+				u"│",
+				Widget( (
+					Text("dir:", formatter=t_formatter_w),
+					Text(" total=", formatter=t_formatter_wr),
+					self.wdir_timing_total,
+					Text(" ave=", formatter=t_formatter_wr),
+					self.wdir_timing_ave,
+					Filler(),
+				), span=-33.33),
+				Widget( (
+					Text("tst:", formatter=t_formatter_w),
+					Text(" last=", formatter=t_formatter_wr),
+					self.wtst_timing_last,
+					Filler(),
+				), span=-33.33),
+				Widget( (
+					Text("tot:", formatter=t_formatter_w),
+					Text(" total=", formatter=t_formatter_wr),
+					self.wtot_timing_total,
+					Text(" ave=", formatter=t_formatter_wr),
+					self.wtot_timing_ave,
+					Filler(),
+				), span=-33.33),
+				u"┃",
+			),
+		)
+    line_command = Line(
+			(
+				u"┃",
+				Text("COMMAND".center(7), formatter=t_formatter_w),
+				u"│",
+				self.wtst_command,
+				u"┃",
+			),
+		)
+    line_dir = Line(
+			(
+				u"┃",
+				Text("DIR".center(7), formatter=t_formatter_w),
+				u"│",
+				u"❨",
+				self.wdir_completed_percentage,
+				u"❩",
+				self.wdir_name,
+				wdir_container,
+				#u'◀', self.wdir_pbar, u'▶'
+				#'[',
+				#self.wdir_remaining_duration,
+				#']'
+				u"┃",
+			),
+		)
+    line_test = Line(
+			(
+				u"┃",
+				Text("TEST".center(7), formatter=t_formatter_w),
+				u"│",
+				u"❨",
+				self.wtst_completed_percentage,
+				u"❩",
+				self.wtst_name,
+				wtst_container,
+				#u'◀', self.wtst_pbar, u'▶'
+				#'[',
+				#self.wtst_remaining_duration,
+				#']'
+				u"┃",
+			),
+		)
+    line_total = Line(
+			(
+				u"┃",
+				Text("TOTAL".center(7), formatter=t_formatter_w),
+				u"│",
+				u"❨",
+				self.wtot_completed_percentage,
+				u"❩",
+				u'◀', self.wtot_pbar, u'▶'
+				u"❨",
+				self.wtot_remaining_duration,
+				u"❩",
+				u"┃",
+			),
+		)
+    line_bottom = Line(
+			(
+				u"┗━━━━━━━┷",
+				Filler(u"━", after=u"┛"),
+			),
+    )
+    lines = [line_top, line_values, line_percentages, line_timing, line_command, line_dir, line_test, line_total, line_bottom]
+    super(PBar, self).__init__(lines)
+
+#  def error(self, *out):
+#    return self.log(Formatter("red", reverse=True, blink=True), out)
+
+import os
+import sys
+import tempfile
+import subprocess
+import filecmp
+
+CONFIGSPEC_SOURCE = """
+[__DEFAULT__]
+	source_mode = option("file", "string", default="file")
+	source = string(default="")
+	input_mode = option("file", "string", default="string")
+	input = string(default="")
+	output_mode = option("file", "string", default="string")
+	output = string(default="")
+	must_fail = boolean(default=None)
+	options = string(default="")
+	priority = integer(default=None)
+
+[__OVERWRITE__]
+	source_mode = option("file", "string", default=None)
+	source = string(default=None)
+	input_mode = option("file", "string", default=None)
+	input = string(default=None)
+	output_mode = option("file", "string", default=None)
+	output = string(default=None)
+	must_fail = boolean(default=None)
+	options = string(default=None)
+
+[dirs]
+	[[__many__]]
+		dir_name = string(default=None)
+		priority = integer(default=None)
+
+[tests]
+	[[__many__]]
+		source_mode = option("file", "string", default=None)
+		source = string(default=None)
+		input_mode = option("file", "string", default=None)
+		input = string(default=None)
+		output_mode = option("file", "string", default=None)
+		output = string(default=None)
+		must_fail = boolean(default=None)
+		options = string(default=None)
+		priority = integer(default=None)
+"""
+
+
+CONFIGSPEC = configobj.ConfigObj(CONFIGSPEC_SOURCE.split('\n'), list_values=False)
+
+class TestError(Exception):
+  pass
+
+class TestFailure(Exception):
+  pass
+
+#class PBar_Number(pbar.ProgressBarWidget):
+#  def __init__(self, fmt="%3d"):
+#    super(PBar_Number, self).__init__()
+#    self.num = 0
+#
+#  def set(self, num):
+#    self.num = num
+#
+#  def update(self, pbar):
+#    return "%3d" % self.num
+#
+#class PBar_Description(pbar.ProgressBarWidget):
+#  def __init__(self, description, length=30, prefix='...'):
+#    super(PBar_Description, self).__init__()
+#    self.length = length
+#    self.prefix = prefix
+#    self._set_description(description)
+#
+#  def _get_description(self):
+#    return self._description
+#
+#  def _set_description(self, description):
+#    if len(description) > self.length:
+#      description = self.prefix + description[-(self.length+len(self.prefix)):]
+#    self._description = description.ljust(self.length)
+#
+#  description = property(_get_description, _set_description)
+#
+#  def update(self, pbar):
+#    return self.description
+#
+#  def __str__(self):
+#    return self.description
+
+class TestDir(object):
+  CONFIG_FILENAME = '.mu_config'
+  CONFIG_DEFAULT = '__DEFAULT__'
+  CONFIG_OVERWRITE = '__OVERWRITE__'
+  VERBOSE_HEADER = ''
+  VERBOSE_INDENTATION = '  '
+  STATUS = {True: 'ok.', False: 'KO!'}
+  def __init__(self,
+			path,
+			parent=None,
+			raise_after_failure=False,
+			stream=None,
+			verbosity=0,
+			progressbar=None,
+			name=None,
+			pause_after_test=None,
+			max_priority=None,
+			external_interpreter=False,
+    ):
+    self.path = os.path.abspath(path)
+    self.parent = parent
+    self.max_priority = max_priority
+    self.raise_after_failure = raise_after_failure
+    if stream is None:
+      stream = sys.stdout
+    self.stream = stream
+    self.verbosity = verbosity
+    self.pause_after_test = pause_after_test
+    if self.parent is None:
+      self.root = self
+      self.level = 0
+    else:
+      self.root = self.parent.root
+      self.level = self.parent.level + 1
+
+    if progressbar is None:
+      if verbosity == 0:
+        progressbar = True
+      else:
+        progressbar = False
+    self.progressbar = progressbar
+    self.verbose_header = self.VERBOSE_HEADER + self.VERBOSE_INDENTATION*self.level
+    self.full_name = self.path
+    self.external_interpreter = external_interpreter
+
+    if name is None:
+      if self is self.root:
+        name = self.full_name
+
+    self.name = name
+
+    s = self
+    l = []
+    while s is not self.root:
+      l.append(s.name)
+      s = s.parent
+    self.subname = os.path.sep.join(reversed(l))
+
+    self.config_filename = os.path.join(self.path, self.CONFIG_FILENAME)
+    if os.path.lexists(self.config_filename):
+      self.config = configobj.ConfigObj(infile=self.config_filename, configspec=CONFIGSPEC, unrepr=True)
+      # validating
+      validator = validate.Validator(CONFIGSPEC)
+      validation = self.config.validate(validator, preserve_errors=True)
+      if validation is not True:
+        num_errors = 0
+        for sections, key, result in configobj.flatten_errors(self.config, validation):
+          l = sections + [key]
+          #s = '.'.join(l)
+          #if s == '%s.%s' % (self.CONFIG_DEFAULT, 'source') or s == '%s.%s' % (self.CONFIG_OVERWRITE, 'source'):
+          #  continue
+          num_errors += 1
+          print 'ERR: %s => %s' % ('.'.join(l), result)
+        if num_errors > 0:
+          raise TestError, "TestDir[%s]: invalid config file '%s'" % (self.name, self.config_filename)
+    else:
+      self.config = None
+
+
+    self.num_tests = 0
+    self.tests = []
+    self.subdirs = []
+    if self.config:
+      if self.CONFIG_DEFAULT in self.config:
+        self.config_default = self.config[self.CONFIG_DEFAULT]
+      else:
+        self.config_default = None
+      if self.CONFIG_OVERWRITE in self.config:
+        self.config_overwrite = self.config[self.CONFIG_OVERWRITE]
+      else:
+        self.config_overwrite = None
+      tests_section = self.config["tests"]
+      for section_name, section in tests_section.items():
+        #print section_name
+        #print "DEFAULT", self.config_default
+        #print ">>>", section
+        self.apply_default(section)
+        #print "<<<", section
+        #print "OVERWRITE", self.config_overwrite
+        #print ">>>", section
+        self.apply_overwrite(section)
+        #print "<<<", section
+
+        if self.max_priority is not None and section["priority"] > self.max_priority:
+          continue
+
+        tests_section[section_name] = section
+
+        source_mode = section["source_mode"]
+        if source_mode == "file":
+          section["source"] = self._make_abs(section["source"], self.path)
+          source = section["source"]
+          if not os.path.lexists(source):
+            raise TestError, "TestDir[%s]: source file '%s' is missing" % (self.name, source)
+
+        input_mode = section["input_mode"]
+        if input_mode == "file":
+          section["input"] = self._make_abs(section["input"], self.path)
+          input = section["input"]
+          if not os.path.lexists(input):
+            raise TestError, "TestDir[%s]: input file '%s' is missing" % (self.name, input)
+
+        output_mode = section["output_mode"]
+        if output_mode == "file":
+          section["output"] = self._make_abs(section["output"], self.path)
+          output = section["output"]
+          if not os.path.lexists(output):
+            raise TestError, "TestDir[%s]: output file '%s' is missing" % (self.name, output)
+      
+        self.tests.append(section_name)
+      dirs_section = self.config["dirs"]
+      for section_name, section in dirs_section.iteritems():
+        if section["dir_name"] is None:
+          section["dir_name"] = self._make_abs(section_name, self.path)
+        else:
+          section["dir_name"] = self._make_abs(section["dir_name"], self.path)
+        if not os.path.isdir(section["dir_name"]):
+          raise TestError, "TestDir[%s]: invalid subdir %s" % (self.name, section["dir_name"])
+        if self.max_priority is not None and section["priority"] > self.max_priority:
+          continue
+        self.subdirs.append(
+				TestDir(
+						section["dir_name"],
+						self,
+						name=section_name,
+						raise_after_failure=self.raise_after_failure,
+						stream=self.stream,
+						verbosity=self.verbosity,
+						progressbar=self.progressbar,
+						pause_after_test=self.pause_after_test,
+						max_priority=self.max_priority,
+						external_interpreter=self.external_interpreter,
+					)
+        )
+    self.num_tests += len(self.tests)
+    self.num_subdirs = len(self.subdirs)
+    self.num_run_tests = 0
+    self.mu_command = os.path.join(os.environ["MU_HOME"], 'bin', 'mu_interpreter')
+      
+    self._failed_tests = []
+    self._set_root()
+
+  def get_max_sizes(self):
+    l = [subdir.get_max_sizes() for subdir in self.subdirs]
+    max_tst_list = [0]
+    max_tst_list.extend(len(test) for test in self.tests)
+    max_tst_list.extend(e[0] for e in l)
+    max_dir_list = [0]
+    max_dir_list.append(len(self.name))
+    max_dir_list.extend(e[1] for e in l)
+    max_tst = max(max_tst_list)
+    max_dir = max(max_dir_list)
+    return max_tst, max_dir
+    
+  def _set_root(self):
+    if self is self.root:
+      self.total_num_failed_tests = len(self.failed_tests())
+      self.total_num_tests = self._sub_num_tests()
+      self.total_num_subdirs = self._sub_num_subdirs()
+      if self.total_num_tests <= 0:
+        self.progressbar = False
+      if self.progressbar:
+        self._progressbar = PBar()
+#        self.pbar_description = PBar_Description('', prefix='')
+#        self.pbar_num_done = PBar_Number()
+#        self.pbar_num_fail = PBar_Number()
+#        self.pbar_num_todo = PBar_Number()
+#        widgets = [
+#			'[',
+#			self.pbar_description,
+#			'|',
+#			self.pbar_num_fail,
+#			':',
+#			self.pbar_num_done,
+#			'/',
+#			self.pbar_num_todo,
+#			']',
+#			pbar.Percentage(),
+#			' ',
+#			pbar.Bar(marker='#'),
+#			' ',
+#			pbar.ETA(),
+#        ]
+#        self._progressbar = pbar.ProgressBar(widgets=widgets, maxval=self.total_num_tests)
+
+  def failed_tests(self):
+    l = self._failed_tests[:]
+    for subdir in self.subdirs:
+      l.extend(subdir.failed_tests())
+    return l
+
+  def report(self):
+    failed_tests = self.failed_tests()
+    lines = []
+    lines.append("Number of TestDirs:     %d" % self.root.total_num_subdirs)
+    lines.append("Number of Tests:        %d" % self.root.total_num_tests)
+    lines.append("Number of failed Tests: %d" % len(failed_tests))
+    if failed_tests:
+      lines.append("FAILED TESTS:")
+      for failed_test_dir, failed_test, reason in failed_tests:
+        lines.append(" o %s/%s [%s]" % (failed_test_dir.name, failed_test, reason))
+    return lines
+
+  def apply_default(self, target):
+    if self.config_default is not None:
+      self._apply_default(target, self.config_default)
+
+  def _apply_default(self, target, default):
+    for key, val in default.iteritems():
+      if isinstance(val, configobj.Section):
+        if not key in target:
+          target[key] = Section(target, target.depth+1, target.main, indict=val, name=key)
+        else:
+          self.apply_default(target[key], default[key])
+      else:
+        if not key in target or target[key] in ("", None):
+          target[key] = val
+      
+  def apply_overwrite(self, target):
+    if self.config_overwrite is not None:
+      self._apply_overwrite(target, self.config_overwrite)
+
+  def _apply_overwrite(self, target, overwrite):
+    for key, val in overwrite.iteritems():
+      if isinstance(val, configobj.Section):
+        if not key in target:
+          target[key] = Section(target, target.depth+1, target.main, indict=val, name=key)
+        else:
+          self.apply_overwrite(target[key], overwrite[key])
+      else:
+        if not val in ("", None):
+          target[key] = val
+  
+  @classmethod
+  def _make_abs(clss, path, basepath):
+    if os.path.isabs(path):
+      return path
+    else:
+      return os.path.abspath(os.path.join(basepath, path))
+
+  def _sub_num_run_tests(self):
+    n = sum(subdir._sub_num_run_tests() for subdir in self.subdirs)
+    return self.num_run_tests + n
+
+  def _sub_num_tests(self):
+    n = sum(subdir._sub_num_tests() for subdir in self.subdirs)
+    return self.num_tests + n
+
+  def _sub_num_subdirs(self):
+    if self.parent is None:
+      n = 1
+    else:
+      n = 0
+    n += sum(subdir._sub_num_subdirs() for subdir in self.subdirs)
+    return self.num_subdirs + n
+
+#  def full_dirname(self):
+#    l = []
+#    d = self
+#    while d is not None:
+#      l.append(d.name)
+#      d = d.parent
+#    return os.path.sep.join(reversed(l))
+
+  def run(self):
+    self.root.total_num_run_tests = 0
+    self.root.total_num_run_subdirs = 0
+    self.root.total_num_failed_subdirs = 0
+    self.root.tot_timing_total = 0.0
+    if self.progressbar:
+      max_tst, max_dir = self.root.get_max_sizes()
+      mx = max(max_tst, max_dir)
+      self.root._progressbar.wtst_name.span.set_size(mx)
+      self.root._progressbar.wdir_name.span.set_size(mx)
+      self.root._progressbar.wtot_pbar.set_max_value(self.root.total_num_tests)
+      self.root._progressbar.wdir_pbar.set_max_value(self.root.total_num_subdirs)
+      self.root._progressbar.span.set_root()
+      #print '\n'.join(self.root._progressbar.span.dump())
+      #raw_input("ok?")
+      self.root._progressbar.start()
+      #print '\n'.join(self.root._progressbar.span.dump())
+    self._run()
+    if self.progressbar:
+      #self.root._progressbar.clear()
+      self.root._progressbar.finish()
+
+  def _run(self):
+    sub_header = self.verbose_header + self.VERBOSE_INDENTATION
+    os.chdir(self.path)
+    if self.verbosity > 0:
+      self.stream.write("%sTestDir[%s]\n" % (self.verbose_header, self.name))
+      self.stream.flush()
+
+    dir_failed = False
+    self.dir_timing_total = 0.0
+    if self.config:
+      if self.progressbar:
+        self.root._progressbar.wtst_pbar.set_max_value(self.num_tests)
+        self.root._progressbar.wdir_name.set_text(self.subname)
+      #if len(self.tests) == 0:
+      #  self.root._progressbar.warning("WARNING: dir %s has no tests\n" % (self.full_name, ))
+      for test in self.tests:
+        if self.verbosity == 1:
+          self.stream.write("%sTest[%s]..." % (sub_header, test))
+          self.stream.flush()
+        config = self.config["tests"][test]
+        if self.verbosity > 3:
+          self.stream.write("%sTest[%s]\n" % (sub_header, test))
+          for key, val in config.iteritems():
+            self.stream.write("%s\t%s = %r\n" % (sub_header, key, val))
+          self.stream.flush()
+        source_mode = config["source_mode"]
+        source = config["source"]
+        if source_mode == "file":
+          source_file = file(source, "rb")
+        else:
+          source_file = tempfile.NamedTemporaryFile(prefix="tmp.%s."%test, suffix=".mu")
+          source_file.write(source)
+          source_file.flush()
+          source_file.seek(0)
+        try:
+          input_mode = config["input_mode"]
+          input = config["input"]
+          output_mode = config["output_mode"]
+          output = config["output"]
+          must_fail = config["must_fail"]
+          options = config["options"]
+          mu_command_list = [self.mu_command]
+          mu_options_list = []
+          mu_wcommand_list = [os.path.basename(self.mu_command)]
+          if options:
+            mu_command_list.append(options)
+            mu_options_list.append(options)
+            mu_wcommand_list.append(options)
+          mu_command_list.append(source_file.name)
+          mu_options_list.append(source_file.name)
+          mu_wcommand_list.append(os.path.relpath(source_file.name, self.root.path))
+          if input_mode == "file":
+            in_file = file(input, "rb")
+          elif input_mode == "string":
+            in_file = tempfile.NamedTemporaryFile(prefix="tmp.%s."%test, suffix=".in")
+            in_file.write(input)
+            in_file.flush()
+            in_file.seek(0)
+          try:
+            out_file = tempfile.NamedTemporaryFile(prefix="tmp.%s."%test, suffix=".out")
+          
+            try:
+              if output_mode == "file":
+                expected_out_file = file(output, "rb")
+              elif output_mode == "string":
+                expected_out_file = tempfile.NamedTemporaryFile(prefix="tmp.%s."%test, suffix=".out")
+                expected_out_file.write(output)
+                expected_out_file.flush()
+                expected_out_file.seek(0)
+              try:
+                if self.verbosity > 2:
+                  self.stream.write("%s>>> %s\n" % (sub_header, ' '.join(mu_command_list)))
+                  self.stream.write("%sinput_file = %s\n" % (sub_header, in_file.name))
+                  self.stream.write("%soutput_file = %s\n" % (sub_header, out_file.name))
+                  self.stream.write("%sexpected_output_file = %s\n" % (sub_header, expected_out_file.name))
+                  self.stream.flush()
+                if self.progressbar:
+                  self.root._progressbar.wtst_name.set_text(test)
+                  tot_num_ko = self.root.total_num_failed_tests
+                  tot_num_ok = self.root.total_num_run_tests - tot_num_ko
+                  tst_num_ko = len(self._failed_tests)
+                  tst_num_ok = self.num_run_tests - tst_num_ko
+                  self.root._progressbar.wtot_pbar.set_values((tot_num_ko, tot_num_ok))
+                  self.root._progressbar.wtst_pbar.set_values((tst_num_ko, tst_num_ok))
+                  self.root._progressbar.wtst_command.set_text(" ".join(mu_wcommand_list))
+                  self.root._progressbar.render()
+                t0 = mu.elapsed_seconds()
+                if self.external_interpreter:
+                  subp = subprocess.Popen(mu_command_list, stdout=out_file, stdin=in_file, stderr=subprocess.STDOUT)
+                  subp.communicate()
+                  exit_code = subp.returncode
+                else:
+                  try:
+                    mu_interpreter = mu.Mu_Interpreter(stdout=out_file, stdin=in_file, stderr=out_file)
+                    mu_interpreter.parse_args(mu_options_list)
+                    mu_interpreter.parse()
+                    mu_interpreter.run()
+                  except mu.Mu_CodeError, e:
+                    exit_code = 1
+                  except mu.Mu_Error, e:
+                    exit_code = 2
+                  except Exception, e:
+                    import traceback
+                    traceback.print_exc()
+                    exit_code = 3
+                  else:
+                    exit_code = 0
+                  #raw_input("EC=%s"%exit_code)
+                t1 = mu.elapsed_seconds()
+                tst_timing_last = t1-t0
+                cmp_result = filecmp.cmp(out_file.name, expected_out_file.name, shallow=False)
+                if self.verbosity > 2:
+                  self.stream.write("%sexit_code = %s\n" % (sub_header, exit_code))
+                  self.stream.write("%scmp_result = %s\n" % (sub_header, cmp_result))
+                  self.stream.flush()
+                status = True
+                if must_fail:
+                  if exit_code == 0:
+                    status = False
+                    reason = "test must fail but was succsessfull"
+                else:
+                  if exit_code != 0:
+                    status = False
+                    reason = "test exit code is %d" % exit_code
+                  if not cmp_result:
+                    status = False
+                    reason = "output does not match (%s!=%s)" % (out_file.name, expected_out_file.name)
+                    if self.verbosity > 2:
+                      with file(out_file.name, "rb") as f:
+                        for line in f:
+                          self.stream.write("%sOUT> %r\n" % (sub_header, line))
+                          self.stream.flush()
+                if self.verbosity > 1:
+                  self.stream.write("%sstatus = %s\n" % (sub_header, status))
+                if self.verbosity == 1:
+                  self.stream.write("\b\b\b => %d %s\n" % (exit_code, self.STATUS[status]))
+                  self.stream.flush()
+                self.num_run_tests += 1
+                self.root.total_num_run_tests += 1
+                self.dir_timing_total += tst_timing_last
+                dir_timing_ave = float(self.dir_timing_total)/self.num_run_tests
+                self.root.tot_timing_total += tst_timing_last
+                tot_timing_ave = float(self.root.tot_timing_total)/self.root.total_num_run_tests
+                if self.progressbar:
+                  self.root._progressbar.wtst_timing_last.set_value(tst_timing_last)
+                  self.root._progressbar.wdir_timing_total.set_value(self.dir_timing_total)
+                  self.root._progressbar.wdir_timing_ave.set_value(dir_timing_ave)
+                  self.root._progressbar.wtot_timing_total.set_value(self.root.tot_timing_total)
+                  self.root._progressbar.wtot_timing_ave.set_value(tot_timing_ave)
+                if not status:
+                  if self.progressbar:
+                    self.root._progressbar.error("ERROR: failed test: %s/%s: %s\n" % (self.name, test, reason))
+                  self.root.total_num_failed_tests += 1
+                  dir_failed += 1
+                if self.progressbar:
+                  #self.root.pbar_description.description = os.path.join(self.name, test)
+                  #self.root.pbar_num_done.set(self.root.total_num_run_tests)
+                  #self.root.pbar_num_fail.set(self.root.total_num_failed_tests)
+                  #self.root.pbar_num_todo.set(self.root.total_num_tests)
+                  #self.root._progressbar.update(self.root.total_num_run_tests)
+                  tot_num_ko = self.root.total_num_failed_tests
+                  tot_num_ok = self.root.total_num_run_tests - tot_num_ko
+                  tst_num_ko = len(self._failed_tests)
+                  tst_num_ok = self.num_run_tests - tst_num_ko
+                  self.root._progressbar.wtot_pbar.set_values((tot_num_ko, tot_num_ok))
+                  self.root._progressbar.wtst_pbar.set_values((tst_num_ko, tst_num_ok))
+                  self.root._progressbar.render()
+                  #time.sleep(3)
+                if not status:
+                  self._failed_tests.append((self, test, reason))
+                  if self.raise_after_failure:
+                    raise TestFailure, (self, test, reason)
+                if self.pause_after_test:
+                  if self.progressbar:
+                    self.root._progressbar.finish()
+                    self.root._progressbar.stop()
+                  raw_input("PAUSE...")
+                  if self.progressbar:
+                    #self.root._progressbar.clear()
+                    self.root._progressbar.start()
+              finally:
+                if expected_out_file is not None:
+                  expected_out_file.close()
+            finally:
+              if out_file is not None:
+                out_file.close()
+          finally:
+            if in_file is not None:
+              in_file.close()
+        finally:
+          if source_file is not None:
+            source_file.close()
+    if dir_failed:
+      self.root.total_num_failed_subdirs += 1
+    self.root.total_num_run_subdirs += 1
+    if self.progressbar:
+      dir_num_ko = self.root.total_num_failed_subdirs
+      dir_num_ok = self.root.total_num_run_subdirs-dir_num_ko
+      #self.root._progressbar.comment("%d/%d/%d\n" % (dir_num_ko, dir_num_ok, self.root.total_num_subdirs))
+      self.root._progressbar.wdir_pbar.set_values((dir_num_ko, dir_num_ok))
+      self.root._progressbar.render()
+    for subdir in self.subdirs:
+      subdir._run()
+
+  
+if __name__ == '__main__':
+  import sys
+  import optparse
+  from MU import mu_config
+
+  opt_list = [
+                optparse.make_option(   '-V', '--verbosity',
+                                        metavar='V',
+                                        dest='verbosity',
+                                        type='int',
+                                        action='store',
+                                        default=0,
+                                        help='increase verbosity [default: %default]',
+                ),
+                optparse.make_option(   '-v', '--increase-verbosity',
+                                        metavar='V',
+                                        dest='verbosity',
+                                        action='count',
+                                        default=0,
+                                        help='increase verbosity [default: %default]',
+                ),
+                optparse.make_option(   '-s', '--stop-after-failure',
+                                        metavar='S',
+                                        dest='stop_after_failure',
+                                        action='store_true',
+                                        default=False,
+                                        help='stop immediately after a failure [default: %default]',
+                ),
+                optparse.make_option(   '-r', '--report',
+                                        metavar='R',
+                                        dest='report',
+                                        action='store_true',
+                                        default=True,
+                                        help='print a final report[default: %default]',
+                ),
+                optparse.make_option(   '-d', '--dir',
+                                        metavar='D',
+                                        dest='test_dirs',
+                                        action='append',
+                                        default=[],
+                                        help='add a test dir[default: %default]',
+                ),
+                optparse.make_option(   '-p', '--pause-after-test',
+                                        metavar='P',
+                                        dest='pause',
+                                        action='store_true',
+                                        default=False,
+                                        help='pause after each test dir [default: %default]',
+                ),
+                optparse.make_option(   '-m', '--max-priority',
+                                        metavar='M',
+                                        dest='max_priority',
+                                        action='store',
+                                        type='int',
+                                        default=None,
+                                        help='set max priority [default: %default]',
+                ),
+                optparse.make_option(   '-e', '--run-external-interpreter',
+                                        metavar='E',
+                                        dest='external_interpreter',
+                                        action='store_true',
+                                        default=False,
+                                        help='run tests using external interpreter [default: %default]',
+                ),
+  ]
+  help_formatter=optparse.IndentedHelpFormatter(max_help_position=38)
+  parser = optparse.OptionParser(option_list=opt_list,formatter=help_formatter)
+
+  (options,args) = parser.parse_args(sys.argv[1:])
+
+  options.test_dirs.extend(args)
+  if len(options.test_dirs) == 0:
+    options.test_dirs.append(mu_config.MU_TESTDIR)
+
+  for tdir in options.test_dirs:
+    test_dir = TestDir(
+				tdir,
+				raise_after_failure=options.stop_after_failure,
+				verbosity=options.verbosity,
+				pause_after_test=options.pause,
+				max_priority=options.max_priority
+    )
+
+    try:
+      test_dir.run()
+    except TestFailure, e:
+      test_dir, test, reason = e.args
+      sys.stderr.write("ERR: test %s/%s failed: %s\n" % (test_dir.name, test, reason))
+  
+    if options.report:
+      print '\n'.join(test_dir.report())

@@ -1,0 +1,25 @@
+[__DEFAULT__]
+	output_mode = "file"
+	output = "99_bottles.out"
+
+[tests]
+	[[99_bottles_00]]
+		source = "test_99_bottles_00.mu"
+
+	[[99_bottles_01]]
+		source = "test_99_bottles_01.mu"
+
+	[[99_bottles_02]]
+		source = "test_99_bottles_02.mu"
+
+	[[99_bottles_03]]
+		source = "test_99_bottles_03.mu"
+
+	[[99_bottles_04]]
+		source = "test_99_bottles_04.mu"
+
+	[[99_bottles_05]]
+		source = "test_99_bottles_05.mu"
+
+	[[99_bottles_06]]
+		source = "test_99_bottles_06.mu"

@@ -1,0 +1,2 @@
+def PYM_HelloWorld(thread):
+  thread.mu_board.mu.console.put(thread, "Hello, world!\n")

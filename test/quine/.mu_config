@@ -1,0 +1,15 @@
+[__DEFAULT__]
+	output = "ok"
+
+[__OVERWRITE__]
+	input = ""
+
+[tests]
+	[[quine_00]]
+		source = "test_quine_00.mu"
+		output_mode = "file"
+		output = "test_quine_00.mu"
+	[[quine_01]]
+		source = "test_quine_01.mu"
+		output_mode = "file"
+		output = "test_quine_01.mu"

@@ -1,0 +1,17 @@
+[__DEFAULT__]
+
+[__OVERWRITE__]
+
+[tests]
+	[[cat_00]]
+		source = "test_cat.mu"
+		output_mode = "file"
+		output = "test_cat.mu"
+		input_mode = "file"
+		input = "test_cat.mu"
+	[[cat_01]]
+		source = "test_cat.mu"
+		output_mode = "file"
+		output = "cat.in"
+		input_mode = "file"
+		input = "cat.in"

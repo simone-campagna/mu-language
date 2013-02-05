@@ -1,0 +1,12 @@
+[__DEFAULT__]
+	output = "ok\n"
+
+[__OVERWRITE__]
+
+[dirs]
+	[[math]]
+
+	[[stack]]
+
+	[[pymath]]
+[tests]

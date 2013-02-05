@@ -1,0 +1,87 @@
+[__DEFAULT__]
+	options = "-lpymath"
+
+[__OVERWRITE__]
+
+[tests]
+	[[iadd]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.add\n"
+		output = "116\n"
+
+	[[fadd]]
+		source = "test_biop_flt.mu"
+		input = "82.5\n-34.7\npymath.add\n"
+		output = "47.8\n"
+
+	[[isub]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.sub\n"
+		output = "48\n"
+
+	[[fsub]]
+		source = "test_biop_flt.mu"
+		input = "82.5\n-34.7\npymath.sub\n"
+		output = "117.2\n"
+
+	[[imul]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.mul\n"
+		output = "2788\n"
+
+	[[fmul]]
+		source = "test_biop_flt.mu"
+		input = "82.5\n-2.5\npymath.mul\n"
+		output = "-206.25\n"
+
+	[[idiv]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.div\n"
+		output = "2\n"
+
+	[[fdiv]]
+		source = "test_biop_flt.mu"
+		input = "82.5\n-2.5\npymath.div\n"
+		output = "-33.0\n"
+
+	[[ipow]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.pow\n"
+		output = "117400779651965717926310031588554901628355478020743470515249741824\n"
+
+	[[fpow]]
+		source = "test_biop_flt.mu"
+		input = "16.0\n0.5\npymath.pow\n"
+		output = "4.0\n"
+
+	[[imod]]
+		source = "test_biop_int.mu"
+		input = "82\n34\npymath.mod\n"
+		output = "14\n"
+
+	[[fmod]]
+		source = "test_biop_flt.mu"
+		input = "4.5\n2.5\npymath.mod\n"
+		output = "2.0\n"
+
+	[[ipos]]
+		source = "test_unop_int.mu"
+		input = "82\npymath.pos\n"
+		output = "82\n"
+
+	[[fpos]]
+		source = "test_unop_flt.mu"
+		input = "4.5\npymath.pos\n"
+		output = "4.5\n"
+
+	[[ineg]]
+		source = "test_unop_int.mu"
+		input = "82\npymath.neg\n"
+		output = "-82\n"
+
+	[[fneg]]
+		source = "test_unop_flt.mu"
+		input = "-4.5\npymath.neg\n"
+		output = "4.5\n"
+
+

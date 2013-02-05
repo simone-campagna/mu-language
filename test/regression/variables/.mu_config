@@ -1,0 +1,17 @@
+[__DEFAULT__]
+	output = "ok\n"
+
+[__OVERWRITE__]
+
+[tests]
+	[[del_variable]]
+		source = "test_del_variable.mu"
+	[[set_global_variable]]
+		source = "test_set_global_variable.mu"
+	[[set_local_variable]]
+		source = "test_set_local_variable.mu"
+	[[variables]]
+		source = "test_variables.mu"
+		output_mode = "file"
+		output = "variables.out"
+		options = "-lvariables"

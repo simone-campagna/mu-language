@@ -1,0 +1,3 @@
+export MU_HOME=$(pwd)
+export PATH="${PATH}:$MU_HOME/bin"
+export PYTHONPATH="$MU_HOME/lib/python:${PATH}"

@@ -1,0 +1,28 @@
+[__DEFAULT__]
+	output = "ok\n"
+
+[__OVERWRITE__]
+	input = ""
+
+[dirs]
+
+[tests]
+	[[speed_00]]
+		source = "test_speed_00.mu"
+		priority = 2
+
+	[[speed_01]]
+		source = "test_speed_01.mu"
+		priority = 2
+
+	[[speed_02]]
+		source = "test_speed_02.mu"
+		priority = 2
+
+	[[speed_03]]
+		source = "test_speed_03.mu"
+		priority = 2
+
+	[[speed_04]]
+		source = "test_speed_04.mu"
+		priority = 2

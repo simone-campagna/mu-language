@@ -1,0 +1,2 @@
+next command will fail: ok, exception catched
+next command will not fail: ok, no exception found

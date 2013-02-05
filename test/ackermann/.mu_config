@@ -1,0 +1,12 @@
+[__DEFAULT__]
+	output = "ok"
+
+[__OVERWRITE__]
+	input = ""
+
+[tests]
+	[[ackermann]]
+		source = "test_ackermann.mu"
+		output_mode = "file"
+		output = "ackermann.out"
+		options = "-lackermann"

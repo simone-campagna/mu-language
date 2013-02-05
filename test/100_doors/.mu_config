@@ -1,0 +1,5 @@
+[100_doors]
+	source = "test_100_doors.mu"
+	output_mode = "file"
+	output = "100_doors.out"
+	options = "-lmath"

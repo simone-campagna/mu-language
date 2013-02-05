@@ -1,0 +1,282 @@
+[__DEFAULT__]
+	output = "ok\n"
+	priority = 0
+
+[__OVERWRITE__]
+
+[dirs]
+	[[functions]]
+		priority = 1
+
+	[[variables]]
+		priority = 1
+
+	[[library]]
+		priority = 1
+
+[tests]
+	[[absorber]]
+		source = "test_absorber.mu"
+
+	[[begin_and_hold]]
+		source = "test_begin_and_hold.mu"
+
+	[[block]]
+		source = "test_block.mu"
+
+	[[bridge]]
+		source = "test_bridge.mu"
+
+	[[directions]]
+		source = "test_directions.mu"
+
+	[[exception_raise_try]]
+		source = "test_exception_raise_try.mu"
+
+	[[exception_try]]
+		source = "test_exception_try.mu"
+		output_mode = "file"
+		output = "exception_try.out"
+
+	[[exception_unroll]]
+		source = "test_exception_unroll.mu"
+		output_mode = "file"
+		output = "exception_unroll.out"
+
+	[[fork_join]]
+		source = "test_fork_join.mu"
+
+	[[function_call]]
+		source = "test_function_call.mu"
+
+	[[function_define]]
+		source = "test_function_define.mu"
+
+	[[function_return]]
+		source = "test_function_return.mu"
+
+	[[hinge]]
+		source = "test_hinge.mu"
+
+	[[hold_release_00]]
+		source = "test_hold_release_00.mu"
+
+	[[ifunction_call]]
+		source = "test_ifunction_call.mu"
+
+	[[ignore]]
+		source = "test_ignore.mu"
+
+	[[ioperator_call]]
+		source = "test_ioperator_call.mu"
+
+	[[istaticfunction]]
+		source = "test_istaticfunction.mu"
+		output_mode = "file"
+		output = "istaticfunction.out"
+
+	[[lambda]]
+		source = "test_lambda.mu"
+
+	[[library]]
+		source = "test_library.mu"
+		options = "-llibrary"
+
+	[[load]]
+		source = "test_load.mu"
+
+	[[main_function_00]]
+		source = "test_main_function_00.mu"
+
+	[[main_function_01]]
+		source = "test_main_function_01.mu"
+
+	[[main_function_02]]
+		source = "test_main_function_02.mu"
+
+	[[module]]
+		source = "test_module.mu"
+		options = "-lmodule"
+
+	[[multiple_main]]
+		source = "test_multiple_main.mu"
+		output = "ok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\nok\n"
+
+	[[multiple_function_calls]]
+		source = "test_multiple_function_calls.mu"
+		output_mode = "file"
+		output = "multiple_function_calls.out"
+
+	[[multiplicity]]
+		source = "test_multiplicity.mu"
+
+	[[obstacle]]
+		source = "test_obstacle.mu"
+
+	[[operator_call]]
+		source = "test_operator_call.mu"
+
+	[[operator_define]]
+		source = "test_operator_define.mu"
+
+	[[operator_overloading]]
+		source = "test_operator_overloading.mu"
+
+	[[operator_return]]
+		source = "test_operator_return.mu"
+
+	[[serialize]]
+		source = "test_serialize.mu"
+		output_mode = "file"
+		output = "serialize.out"
+
+	[[stack_ascii_input]]
+		source = "test_stack_ascii_input.mu"
+		input_mode = "file"
+		input = "stack_ascii_input.in"
+
+	[[stack_ascii_print]]
+		source = "test_stack_ascii_print.mu"
+
+	[[stack_backspace]]
+		source = "test_stack_backspace.mu"
+		output_mode = "file"
+		output = "stack_backspace.out"
+
+	[[stack_carriage_return]]
+		source = "test_stack_carriage_return.mu"
+		output_mode = "file"
+		output = "stack_carriage_return.out"
+
+	[[stack_char_input]]
+		source = "test_stack_char_input.mu"
+		input_mode = "file"
+		input = "stack_char_input.in"
+
+	[[stack_clear]]
+		source = "test_stack_clear.mu"
+
+	[[stack_clone]]
+		source = "test_stack_clone.mu"
+
+	[[stack_decrement]]
+		source = "test_stack_decrement.mu"
+		output_mode = "file"
+		output = "stack_decrement.out"
+
+	[[stack_digit]]
+		source = "test_stack_digit.mu"
+		output_mode = "file"
+		output = "stack_digit.out"
+
+	[[stack_duplicate]]
+		source = "test_stack_duplicate.mu"
+		output_mode = "file"
+		output = "stack_duplicate.out"
+
+	[[stack_escaped_push]]
+		source = "test_stack_escaped_push.mu"
+
+	[[stack_if_negative]]
+		source = "test_stack_if_negative.mu"
+
+	[[stack_if_nonzero]]
+		source = "test_stack_if_nonzero.mu"
+
+	[[stack_if_positive]]
+		source = "test_stack_if_positive.mu"
+
+	[[stack_if_zero]]
+		source = "test_stack_if_zero.mu"
+
+	[[stack_increment]]
+		source = "test_stack_increment.mu"
+		output_mode = "file"
+		output = "stack_increment.out"
+
+	[[stack_int]]
+		source = "test_stack_int.mu"
+		output_mode = "file"
+		output = "stack_int.out"
+
+	[[stack_integer_input]]
+		source = "test_stack_integer_input.mu"
+		input_mode = "file"
+		input = "stack_integer_input.in"
+
+	[[stack_integer_print]]
+		source = "test_stack_integer_print.mu"
+		output_mode = "file"
+		output = "stack_integer_print.out"
+
+	[[stack_join]]
+		source = "test_stack_join.mu"
+
+	[[stack_length]]
+		source = "test_stack_length.mu"
+		output_mode = "file"
+		output = "stack_length.out"
+
+	[[stack_move]]
+		source = "test_stack_move.mu"
+
+	[[stack_negate]]
+		source = "test_stack_negate.mu"
+		output_mode = "file"
+		output = "stack_negate.out"
+
+	[[stack_newline]]
+		source = "test_stack_newline.mu"
+		output_mode = "file"
+		output = "stack_newline.out"
+
+	[[stack_pop]]
+		source = "test_stack_pop.mu"
+
+	[[stack_push]]
+		source = "test_stack_push.mu"
+
+	[[stack_reverse]]
+		source = "test_stack_reverse.mu"
+
+	[[stack_rotate_left]]
+		source = "test_stack_rotate_left.mu"
+
+	[[stack_rotate_right]]
+		source = "test_stack_rotate_right.mu"
+
+	[[stack_space]]
+		source = "test_stack_space.mu"
+		output_mode = "file"
+		output = "stack_space.out"
+
+	[[stack_split]]
+		source = "test_stack_split.mu"
+
+	[[stack_string]]
+		source = "test_stack_string.mu"
+
+	[[stack_tab]]
+		source = "test_stack_tab.mu"
+		output_mode = "file"
+		output = "stack_tab.out"
+
+	[[stack_up_down]]
+		source = "test_stack_up_down.mu"
+
+	[[staticfunction]]
+		source = "test_staticfunction.mu"
+		output_mode = "file"
+		output = "staticfunction.out"
+
+	[[string_escape]]
+		source = "test_string_escape.mu"
+		output_mode = "file"
+		output = "string_escape.out"
+
+	[[wait]]
+		source = "test_wait.mu"
+
+	[[wait_multiplicity]]
+		source = "test_wait_multiplicity.mu"
+

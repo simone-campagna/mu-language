@@ -1,0 +1,78 @@
+[__DEFAULT__]
+	output = "Hello, world!\n"
+
+[__OVERWRITE__]
+	input = ""
+
+[tests]
+	[[hello_world_00]]
+		source = "test_hello_world_00.mu"
+	[[hello_world_01]]
+		source = "test_hello_world_01.mu"
+	[[hello_world_02]]
+		source = "test_hello_world_02.mu"
+	[[hello_world_03]]
+		source = "test_hello_world_03.mu"
+	[[hello_world_04]]
+		source = "test_hello_world_04.mu"
+	[[hello_world_05]]
+		source = "test_hello_world_05.mu"
+	[[hello_world_06]]
+		source = "test_hello_world_06.mu"
+	[[hello_world_07]]
+		source = "test_hello_world_07.mu"
+	[[hello_world_08]]
+		source = "test_hello_world_08.mu"
+	[[hello_world_09]]
+		source = "test_hello_world_09.mu"
+	[[hello_world_10]]
+		source = "test_hello_world_10.mu"
+	[[hello_world_11]]
+		source = "test_hello_world_11.mu"
+	[[hello_world_12]]
+		source = "test_hello_world_12.mu"
+	[[hello_world_13]]
+		source = "test_hello_world_13.mu"
+	[[hello_world_14]]
+		source = "test_hello_world_14.mu"
+	[[hello_world_15]]
+		source = "test_hello_world_15.mu"
+	[[hello_world_16]]
+		source = "test_hello_world_16.mu"
+	[[hello_world_17]]
+		source = "test_hello_world_17.mu"
+	[[hello_world_18]]
+		source = "test_hello_world_18.mu"
+	[[hello_world_19]]
+		source = "test_hello_world_19.mu"
+	[[hello_world_20]]
+		source = "test_hello_world_20.mu"
+	[[hello_world_21]]
+		source = "test_hello_world_21.mu"
+	[[hello_world_22]]
+		source = "test_hello_world_22.mu"
+	[[hello_world_23]]
+		source = "test_hello_world_23.mu"
+	[[hello_world_24]]
+		source = "test_hello_world_24.mu"
+	[[hello_world_25]]
+		source = "test_hello_world_25.mu"
+	[[hello_world_26]]
+		source = "test_hello_world_26.mu"
+	[[hello_world_27]]
+		source = "test_hello_world_27.mu"
+	[[hello_world_28]]
+		source = "test_hello_world_28.mu"
+	[[hello_world_29]]
+		source = "test_hello_world_29.mu"
+	[[hello_world_30]]
+		source = "test_hello_world_30.mu"
+	[[hello_world_31]]
+		source = "test_hello_world_31.mu"
+	[[hello_world_32]]
+		source = "test_hello_world_32.mu"
+	[[hello_world_33]]
+		source = "test_hello_world_33.mu"
+	[[hello_world_34]]
+		source = "test_hello_world_34.mu"
+		options = "-lhello_world"

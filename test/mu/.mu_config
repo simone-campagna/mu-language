@@ -1,0 +1,11 @@
+[__DEFAULT__]
+
+[__OVERWRITE__]
+
+[dirs]
+
+[tests]
+	[[mu]]
+		source = "test_mu.mu"
+		output = "Mu Language 3.0\n"
+		priority = 0

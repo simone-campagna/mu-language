@@ -1,0 +1,13 @@
+[__DEFAULT__]
+	output = "ok\n"
+	options = "-lstack"
+
+[__OVERWRITE__]
+
+[tests]
+	[[sort]]
+		source = "test_sort.mu"
+		output_mode = "file"
+		output = "sort.out"
+		input_mode = "file"
+		input = "sort.in"

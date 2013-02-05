@@ -1,0 +1,44 @@
+[__DEFAULT__]
+	output = "ok"
+
+[__OVERWRITE__]
+	input = ""
+
+[dirs]
+	[[mu]]
+		priority = 0
+
+	[[regression]]
+		priority = 0
+
+	[[hello_world]]
+		priority = 1
+
+	[[rot13]]
+		priority = 2
+
+	[[cat]]
+		priority = 2
+
+	[[quine]]
+		priority = 2
+
+	[[99_bottles]]
+		priority = 1
+
+	[[100_doors]]
+		priority = 2
+
+	[[ackermann]]
+		priority = 2
+
+	[[conway]]
+		priority = 2
+
+	[[fibonacci]]
+		priority = 2
+
+	[[speed]]
+		priority = 3
+
+[tests]

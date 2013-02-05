@@ -1,0 +1,79 @@
+[__DEFAULT__]
+	output = "ok\n"
+	options = "-lmath"
+
+[__OVERWRITE__]
+
+[tests]
+	[[diff]]
+		source = "test_diff.mu"
+		output_mode = "file"
+		output = "diff.out"
+	[[eq]]
+		source = "test_eq.mu"
+		output_mode = "file"
+		output = "eq.out"
+	[[factorial]]
+		source = "test_factorial.mu"
+		output_mode = "file"
+		output = "factorial.out"
+	[[factorization]]
+		source = "test_factorization.mu"
+		output_mode = "file"
+		output = "factorization.out"
+	[[fast_mult]]
+		source = "test_fast_mult.mu"
+		output_mode = "file"
+		output = "fast_mult.out"
+	[[ge]]
+		source = "test_ge.mu"
+		output_mode = "file"
+		output = "ge.out"
+	[[gt]]
+		source = "test_gt.mu"
+		output_mode = "file"
+		output = "gt.out"
+	[[is_prime]]
+		source = "test_is_prime.mu"
+		output_mode = "file"
+		output = "is_prime.out"
+	[[le]]
+		source = "test_le.mu"
+		output_mode = "file"
+		output = "le.out"
+	[[lt]]
+		source = "test_lt.mu"
+		output_mode = "file"
+		output = "lt.out"
+	[[mod]]
+		source = "test_mod.mu"
+		output_mode = "file"
+		output = "mod.out"
+	[[mult]]
+		source = "test_mult.mu"
+		output_mode = "file"
+		output = "mult.out"
+	[[ne]]
+		source = "test_ne.mu"
+		output_mode = "file"
+		output = "ne.out"
+	[[next_prime]]
+		source = "test_next_prime.mu"
+		output_mode = "file"
+		output = "next_prime.out"
+	[[pow]]
+		source = "test_pow.mu"
+		output_mode = "file"
+		output = "pow.out"
+	[[primes_00]]
+		source = "test_primes_00.mu"
+		output_mode = "file"
+		output = "primes_00.out"
+	[[primes_01]]
+		source = "test_primes_01.mu"
+		output_mode = "file"
+		output = "primes_01.out"
+	[[sum]]
+		source = "test_sum.mu"
+		output_mode = "file"
+		output = "sum.out"

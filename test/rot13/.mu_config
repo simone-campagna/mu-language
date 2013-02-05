@@ -1,0 +1,11 @@
+[__DEFAULT__]
+	output = "ok"
+
+[tests]
+	[[rot13]]
+		source = "test_rot13.mu"
+		output_mode = "file"
+		output = "rot13.out"
+		input_mode = "file"
+		input = "rot13.in"
+		options = "-lmath"

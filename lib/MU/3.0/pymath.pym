@@ -1,0 +1,128 @@
+from MU.mu import Mu_Value, Mu_Str, Mu_Flt, Mu_Int
+
+def PYM_add(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia+ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa+fb))
+
+def PYM_sub(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia-ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa-fb))
+
+def PYM_mul(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia*ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa*fb))
+
+def PYM_div(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia/ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa/fb))
+
+def PYM_truediv(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia/ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa/fb))
+
+def PYM_floordiv(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia//ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa//fb))
+
+def PYM_divmod(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    d, m = divmod(ia, ib)
+    stack._push(thread, (Mu_Int(d), Mu_Int(m)))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    d, m = divmod(fa, fb)
+    stack._push(thread, (Mu_Flt(d), Mu_Flt(m)))
+
+def PYM_mod(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia%ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa%fb))
+
+def PYM_pow(thread):
+  stack = thread.stack
+  b, a = stack.pop_latest(thread), stack.pop_latest(thread)
+  if isinstance(b, Mu_Int) and isinstance(a, Mu_Int):
+    ia = a.asInt()
+    ib = b.asInt()
+    stack._push(thread, Mu_Int(ia**ib))
+  else:
+    fa = a.asFlt()
+    fb = b.asFlt()
+    stack._push(thread, Mu_Flt(fa**fb))
+
+def PYM_pos(thread):
+  stack = thread.stack
+  a = stack.pop_latest(thread)
+  if isinstance(a, Mu_Int):
+    stack._push(thread, a.clone())
+  else:
+    stack._push(thread, Mu_Flt(a.asFlt()))
+
+def PYM_neg(thread):
+  stack = thread.stack
+  a = stack.pop_latest(thread)
+  if isinstance(a, Mu_Int):
+    stack._push(thread, Mu_Int(-a.value))
+  else:
+    stack._push(thread, Mu_Flt(-a.asFlt()))
+

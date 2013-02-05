@@ -1,0 +1,12 @@
+[__DEFAULT__]
+
+[__OVERWRITE__]
+
+[tests]
+	[[life]]
+		source = "test_life.mu"
+		input_mode = "file"
+		input = "life.in"
+		output_mode = "file"
+		output = "life.out"
+		options = "-llife"

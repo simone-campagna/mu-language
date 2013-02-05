@@ -1,0 +1,395 @@
+################################################################################
+Mu Language 3.0
+################################################################################
+Mu is a graphical 2D language. This is an example:
+
+=Mu Language 3.0
+=
+@
+@             /-' :P'L:'a:P'n:P'g:P'u:P'a:P'g:P'e:P' :P,
+@             |                                         \
+@  `B-'M:P'u:P/                                          3
+@                                                         ;
+@                                                          '
+@                                                           .
+@                                                            :
+@                                                             P
+@                                                              0
+@                                                               ;
+@                                                                ,~n:PE
+@
+
+Computation consists on `threads'. The previous example show a single thread,
+starting at "`B".
+
+When a "`" char is near to a "B" char, a new thread is generated in the direction
+from "`" to "B".
+
+These are all the possible directions:
+
+   THREAD	DIRECTION
+
+        |
+        B	N
+        `
+
+         /
+        B	NE
+       `
+
+       `B-	E
+ 
+       `
+        B 	SE
+         \
+
+        `
+        B	S
+        |
+
+         `
+        B	SW
+       / 
+       
+       -B`	W
+
+       \
+        B 	NW
+         `
+
+Each thread continues until operators ' ' or '#'.
+
+Computation finishes when an 'E' operator is reached, or when all the running
+threads complete.
+
+Thread direction can also be changed with reflection:
+direction by reflection:
+
+=
+@                  /--    --\      -         -        `            `
+@     |    |       |        |     / \       / \     \  B       /  B
+@     |    |       |        |    /   \     /   \     \  \     /  /
+@ `B--/    \--B`   B        B   B               B     \  \   /  /
+@                  `        `  `                 `     |  | |  |
+@ `B--\    /--B`   B        B   B               B     /  /   \  \
+@     |    |       |        |    \   /     \   /     /  /     \  \
+@     |    |       |        |     \ /       \ /     B  /       B  \
+@                  \--    --/      -         -     `            `
+@
+@  -- i`B--|  |--B`i --
+@
+@         \  /            /  \        |  -
+@        /    \                          |
+@       B      B        i      i      i  B
+@      `        `       `       `     `  `
+@     i          i     B         B    B  i
+@                     /           \   |  
+@   /              \ \             /  -  |
+
+The HINGE operator ',' allows to arbitrarily change the thread direction:
+
+=
+@           ,------,
+@          /       |
+@  `B-----,        |
+@
+@
+
+Threads have a stack. Stack values are integers of arbitrary length. There
+are many operators changing the stack status. For instance, the STACK_PUSH
+operator "'"pushes a value on the stack. It is a unary operator: its
+argument is the following symbol on the thread. The symbol is converted to
+integer and pushed onto the stack.
+The STACK_POP operator "P" pops the latest element from the stack.
+The STACK_INTEGER_PRINT operator ";" prints the latest element on the stack.
+The STACK_ASCII_PRINT operator ":" prints the latest element on the stack,
+converting it to a string.
+
+=bye
+@
+@ `B---'e'y'b:P:P:P
+@
+
+The digit operators "0".."9" push the integer corresponding to the digit on
+the stack:
+
+=3210
+@
+@ `B---0123;P;P;P;P
+@
+
+An arbitrary string can be created using the '".."' operator:
+
+=Hello, world!
+=
+@
+@ `B-"Hello, world!\n":
+@
+
+An arbitrary integer can be created using the "[..]" operator:
+
+=1294242
+@
+@ `B-[1294242];
+@
+
+The STACK_INCREMENT operator '+' increments the latest element on the stack,
+while the STACK_DECREMENT operator '_' decrements it:
+
+=1000
+@
+@ `B-[999]+_+_+;
+@
+
+Threads fork when the CROSS operator '*' is found:
+
+=
+@     \ | /
+@      \|/
+@   `B--*--
+@      /
+@     /
+
+As a result of the CROSS operator, the current thread is completed, and
+new threads are generated following the available directions.
+
+Functions are threads started after "`", "F" chars:
+
+=
+@           `
+@            F
+@`Fa-'a:P     b
+@              '
+@               b
+@                :
+@                 P
+@
+
+The symbol following "F" in the thread is the function name. The function
+thread is run when the function is called, using the CALL operator "C". This
+is a unary operator: it applies on the following character on the thread.
+So:
+
+=abc
+@
+@ `Fx'c'b'a:P:P:P
+@
+@             /-Cx---
+@             |
+@      `B-----/
+@
+
+When a function thread is called, computation continues from function thead,
+while caller thread is suspended. Computation returns to caller thread when
+function is completed, i.e. when the function thread and all its sub-threads
+are completed.
+
+A function can also return, using the FUNCTION_RETURN operator '$'. The returned
+value is the symbol after '$'. It replace the called function symbol in the caller
+thread, and the computation of the caller thread continues on that symbol.
+=abcd
+@
+@ `Fx'c'b'a:P:P:P-$\
+@
+@             /-Cx
+@             |  |
+@      `B-----/  \--'d:P-E
+@
+
+It is possible to have an infinite number of functions. The 'f' operator
+defines a new function whose name is given by last value on the current
+stack. So, if you define
+
+=ok
+=Hello, world!
+=
+@
+@`B-[1000]f-'o:P'k:P~n:P
+@
+@`B-"hello, world"f-"Hello, world!\n":P
+@
+@`B---------[1000]L-"hello, world"L
+@
+
+The problem is that you must be sure that functions are called only when the
+functions have been defined. In principle, the function name can be the result
+of a complex computation.
+
+So, you can use the HOLD 'h' and RELEASE 'r' operators. If one or more threads
+reach the HOLD operator at a given time, they continue, while all other threads
+are susended. When the helding threads reach the RELEASE operator, computation
+of the suspended treads is resumed.
+
+=ok
+=Hello, world!
+=
+@
+@`Bh[1000]rf-'o:P'k:P~n:P
+@
+@`Bh----------------------"hello, world"rf-"Hello, world!\n":P
+@
+@`B---------[1000]L-"hello, world"L
+@
+
+The BEGIN_AND_HOLD operator "H" can be used instead of "B" when starting a thread
+if you want to susend all other threads. Notice that threads holding at the same
+iteration will not be suspended!
+
+=ok
+=Hello, world!
+=
+@
+@`H[1000]rf-'o:P'k:P~n:P
+@
+@`H-----------------------"hello, world"rf-"Hello, world!\n":P
+@
+@`B---------[1000]L-"hello, world"L
+@
+
+Each thread has a local stack LOC_STACK, which is normally the CUR_STACK (the
+stack currently modified by thread operators). New threads have empty LOC_STACKS.
+The STACK_CLONE operator 'q' can be used to copy all he content of the parent 
+thread's LOC_STACK to the CUR_STACK; for instance, you can use this operator to
+copy the content of the caller thread's stack on a function thread:
+
+=ok
+=
+@
+@ `B-"ok\n"-Cp
+@                     `Fpq:
+@
+
+In general, CUR_STACK is a pointer to some LOC_STACK; more in detail, it can be the
+LOC_STACK of the thread itself, or of its parent thread, or of an indirect parent
+stack. Let be CUR_STACK_THREAD the thread owning the LOC_STACK that CUR_STACK is
+pointing to; by default, CUR_STACK_THREAD is the thread itself.
+The STACK_UP operator '^' makes CUR_STACK point to the LOC_STACK of the parent thread
+of CUR_STACK_THREAD. The STACK_DOWN operator 'v' is the inverse.
+
+   thread0		CUR_STACK_0 -> LOC_STACK_0
+     thread1		  CUR_STACK_1 -> LOC_STACK_1
+       thread2		    CUR_STACK_2 -> LOC_STACK_2
+         thread3	      CUR_STACK_3 -> LOC_STACK_3
+
+After '^^' on thread3:
+
+   thread0		CUR_STACK_0 -> LOC_STACK_0
+     thread1		  CUR_STACK_1 -> LOC_STACK_1
+       thread2		    CUR_STACK_2 -> LOC_STACK_2
+         thread3	      CUR_STACK_3 -> LOC_STACK_1
+
+Now,every stack operator on thread3 modifies the LOC_STACK_1 belonging to thread1.
+It is now possible to use the 'v' operator: after 'v' operator on thread3:
+
+   thread0		CUR_STACK_0 -> LOC_STACK_0
+     thread1		  CUR_STACK_1 -> LOC_STACK_1
+       thread2		    CUR_STACK_2 -> LOC_STACK_2
+         thread3	      CUR_STACK_3 -> LOC_STACK_2
+
+and so on. Notice that
+
+a) it is not possible to use '^' if CUR_STACK_THREAD does not have a parent thread
+b) it is possible to use 'v' in a thread only if CUR_STACK_THREAD is not the thread
+   itself, i.e. after some '^'; for instance, it is not possible to use 'v' on thread2,
+   since thread2's CUR_STACK_2 points to thread2's LOC_STACK_2.
+
+###HERE###
+
+Traces can contain some operators. There are unary and void operators:
+	'p'		PUSH 		push next character on the stack 
+	'e'		ESCAPED_PUSH 	push next escaped character on the stack
+	'i'		IGNORE		ignore next character
+	'>'		IF_POSITIVE	if last item on the stack is >0, ignore
+					following character
+	'<'		IF_NEGATIVE	if last item on the stack is <0, ignore
+					following character
+	'='		IF_ZERO		if last item on the stack is ==0, ignore
+					following character
+	'?'		IF_NONZERO	if last item on the stack is !=0, ignore
+					following character
+	'C'		FUNCTION_CALL	call function whose name is given by
+					next character
+	'W'		WAIT		wait N cycles, where N is the last item
+					in the stack
+					
+					following
+
+	'P'		POP		pop one item from the stack
+	'+'		INCREASE	increase the last item on the stack
+	'_'		DECREASE	decrease the last item on the stack
+	'd'		DUPLICATE	duplicate the last item on the stack
+	'!'		NEGATE		negate the last item on the stack
+	'^'		STACK_UP	set CUR_STACK_TRACE to parent trace
+					of CUR_STACK_TRACE
+	'v'		STACK_DOWN	set CUR_STACK_TRACE to child trace
+					of CUR_STACK_TRACE
+	'w'		WAIT_ONE_CYCLE	wait 1 cycle
+	'0'-'9'		0-9		put the integer on the stack
+	'O'		OBSTACLE	orthogonally reflect the trace
+	'#', ' '	ABSORBER	absorb the trace
+	':'		ASCII_PRINT	print the last item on the stack as
+					ascii character
+	';'		INTEGER_PRINT	print the last item on the stack as
+					integer
+	'R'		FUNCTION_RETURN	return from a function
+	'&'		FUNCTION_LOAD	call function whose name is given by
+					last character on the stack
+	'E'		END		exit from interpreter
+	'.'		BRIDGE		placeholder
+	'*'		CROSS		start new traces at any direction, if
+					direction symbol is found
+	'@'		LOAD		use as operator the last character on
+					the stack
+	'I'		INPUT		read an input string, convert it to
+					integer, and put on the stack
+	'f'		FUNCTION_DEFINE	defines a new function whose name is
+					given by the last character on the stack
+	's'		SUSPEND		suspend all the traces but the one
+					executing the operator
+	'r'		RESUME		suspend all suspended traces
+
+---------
+EXAMPLES:
+---------
+LOOP:
+Suppose you want to iterate over (5, 4, 3, 2, 1, 0):
+@
+@  `B-5-i/-;?/_-\
+@        |      |
+@        \-P: p-/
+@
+@
+=5 4 3 2 1 0
+
+Notice that shorter code is faster... This version works is also working:
+
+@
+@  `B-5i/;?/_\
+@       \P: p/
+@
+@
+=5 4 3 2 1 0
+
+UNIDIRECTIONAL CODE:
+A trace can be execute in the two direction. Generally, when you use unary
+operators, you can have syntax errors when following a trace in the opposite
+direction.
+You can change the code that is executed in the two directions. For instance,
+it the following example the 'pt:' code is executed only by the trace
+'*-i ---...', while the 'p:bP' code is executed only by the other trace
+starting at '*'. 
+@     `
+@      B
+@       \        /pt:P\
+@        \       |    |
+@         *-i ---/i---\i--\
+@         i               |
+@                         |
+@         |               |
+@         \------\i---/i--/
+@                |    |
+@                \pb:P/
+@
+=tb
+
+################################################################################
