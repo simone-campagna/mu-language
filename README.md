@@ -3,6 +3,25 @@ mu-language
 
 The MU esoteric language.
 MU is a funge esolang.
+
+## Usage
+Simply source the `env/mu` file from the mu home directory, then run the `mu` command.
+
+The `mu_test` command runs all the test suite.
+
+The `mu` interpreter has also a debugger, with three interfaces:
+* textual (-d)
+* graphical (-x)
+* curses (-w)
+
+The `test` directory contains all the test suite, here you can find many examples. For instance
+```
+$ cd test/hello_world
+$ mu test_hello_world_00.mu
+Hello, world!
+```
+
+## Examples
 An example of code is the following _Hello, world!_ program:
 ```text
                                       ,-^',----:P'w-----:P'r-----:P'd-----:P-,
@@ -190,3 +209,6 @@ This is a quine:
 
 `BQ[158879760829061318991975427000950345381773628394447915895288766801]Cq
 ```
+
+The `test` subdirectory contains much more examples.
+
